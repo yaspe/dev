@@ -12,4 +12,4 @@ def page_title(url):
 
 
 def is_admin(uid):
-    return uid in (1, 2, 3)
+    return uid in (37129726,)

@@ -109,7 +109,7 @@ class TBot(object):
                             continue
                         elif event.command == '/kill' and is_admin(event.uid):
                             self.send_message(event.chat_id, "Stopping")
-                            break
+                            return
 
                     self.process_event(event)
             except Exception as e:

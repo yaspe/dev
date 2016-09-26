@@ -1,6 +1,7 @@
 # coding: utf-8
 
 from bot import TBot
+from settings import TSettings
 from link_db import TLinkDb
 from utils import page_title
 
@@ -22,9 +23,9 @@ class TLinkBot(TBot):
     def start_message(self):
         return self.help_message
 
-    def __init__(self, token, db_path):
-        TBot.__init__(self, token)
-        self.db = TLinkDb(db_path)
+    def __init__(self, settings):
+        TBot.__init__(self, settings.token)
+        self.db = TLinkDb(settings.db_path)
 
     def send_links(self, uid, chat_id, limit=None):
         links = self.db.links(uid, limit)
@@ -50,6 +51,7 @@ class TLinkBot(TBot):
         self.send_help_message(event.chat_id)
 
     def process_event(self, event):
+        print event.uid
         if event.is_command:
             return self.process_command(event)
 
@@ -67,6 +69,4 @@ class TLinkBot(TBot):
 
 
 if __name__ == '__main__':
-    token = '116744597:AAHNusE8kwaTDvA-SJGTSjycn4HPt7Ckp38'
-    bot = TLinkBot(token, '/Users/ya-spe/Downloads/link.db')
-    bot.run()
+    TLinkBot(TSettings('/Users/ya-spe/github/dev/telebot/settings.txt')).run()
