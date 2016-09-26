@@ -38,6 +38,10 @@ class TLinkBot(TBot):
         self.db.remove(link_id, uid)
         self.send_message(chat_id, 'Link #%s has been removed' % link_id)
 
+    def send_stat(self, chat_id):
+        msg = 'Total links: {stat[links]}\nTotal users: {stat[users]}'.format(stat=self.db.total_stat())
+        self.send_message(chat_id, msg)
+
     def process_command(self, event):
         if event.command == '/all':
             return self.send_links(event.uid, event.chat_id)
@@ -47,6 +51,8 @@ class TLinkBot(TBot):
             if not event.args:
                 return self.send_message(event.chat_id, 'Link id is required')
             return self.remove_link(event.uid, event.args[0], event.chat_id)
+        if event.command == '/stat':
+            return self.send_stat(event.chat_id)
 
         self.send_help_message(event.chat_id)
 

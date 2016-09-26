@@ -16,6 +16,19 @@ class TLinkDb(object):
 
         return [{'id': row[0], 'link': row[2].encode('utf-8')} for row in self.conn.execute(sql, (uid, limit))]
 
+    def total_stat(self):
+        sql = 'SELECT * FROM links'
+        users = set()
+        links_num = 0
+        for row in self.conn.execute(sql):
+            links_num += 1
+            users.add(row[1])
+        return {'users': len(users), 'links': links_num}
+
+    def total_users(self):
+        sql = 'SELECT * FROM links'
+        return len([row for row in self.conn.execute(sql)])
+
     def store(self, uid, link):
         sql = 'INSERT INTO links (uid, link) VALUES (?, ?);'
         self.conn.execute(sql, (uid, link))
