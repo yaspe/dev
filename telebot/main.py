@@ -51,7 +51,6 @@ class TLinkBot(TBot):
         self.send_help_message(event.chat_id)
 
     def process_event(self, event):
-        print event.uid
         if event.is_command:
             return self.process_command(event)
 
@@ -65,7 +64,7 @@ class TLinkBot(TBot):
             self.db.store(event.uid, event.message)
             self.send_message(event.chat_id, 'Your link has been stored')
         else:
-            self.send_message(event.chat_id, 'Invalid link')
+            self.send_message(event.chat_id, 'Invalid link, valid link should starts with http or https')
 
 
 if __name__ == '__main__':
