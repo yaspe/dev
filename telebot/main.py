@@ -3,7 +3,7 @@
 from bot import TBot
 from settings import TSettings
 from link_db import TLinkDb
-from utils import page_title
+from utils import page_title, is_admin
 
 
 class TLinkBot(TBot):
@@ -42,6 +42,12 @@ class TLinkBot(TBot):
         msg = 'Total links: {stat[links]}\nTotal users: {stat[users]}'.format(stat=self.db.total_stat())
         self.send_message(chat_id, msg)
 
+    def dump_csv(self, chat_id):
+        reply = []
+        for link in self.db.all_links():
+            reply.append('{},{},{}'.format(link['id'], link['uid'], link['link'].replace(',', '\,')))
+        self.send_message(chat_id, '\n'.join(reply))
+
     def process_command(self, event):
         if event.command == '/all':
             return self.send_links(event.uid, event.chat_id)
@@ -53,6 +59,8 @@ class TLinkBot(TBot):
             return self.remove_link(event.uid, event.args[0], event.chat_id)
         if event.command == '/stat':
             return self.send_stat(event.chat_id)
+        if event.command == '/dump' and is_admin(event.uid):
+            return self.dump_csv(event.chat_id)
 
         self.send_help_message(event.chat_id)
 
