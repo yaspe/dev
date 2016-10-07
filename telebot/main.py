@@ -16,6 +16,7 @@ class TLinkBot(TBot):
             'This is a cool link bot\n'
             'Commands:\n'
             '  /all - shows all your stored links\n'
+            '  /dump - get all your stored links as a .csv file\n'
             '  /get - shows your newest link\n'
             '  /get N - shows your newest N links\n'
             '  /del N - deletes your link with id=N\n'
