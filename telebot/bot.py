@@ -4,6 +4,7 @@ import json
 import urllib
 import urllib2
 import time
+import requests
 
 from utils import is_admin
 
@@ -33,14 +34,16 @@ class TBot(object):
             return result_json
         raise "Bad answer: {}".format(result)
 
-    def _post_req(self, cmd, params=None):
+    def _post_req(self, cmd, params=None, file_path=None):
         if not params:
             params = {}
         api_url = 'https://api.telegram.org/bot{}/{}'.format(self.token, cmd)
-        result = urllib2.urlopen(api_url, urllib.urlencode(params)).read()
-        result_json = json.loads(result)
-        if not result_json['ok']:
-            raise "Bad answer: {}".format(result)
+        files = {"document": open(file_path, "rb")} if file else None
+        result = requests.post(api_url, data=params, files=files)
+        result_json = json.loads(result.content)
+        if result_json['ok']:
+            return result_json
+        raise "Bad answer: {}".format(result)
 
     def _get_offset(self):
         updates = self._get_req('getUpdates')
@@ -90,6 +93,12 @@ class TBot(object):
         if disable_preview:
             params['disable_web_page_preview'] = 'true'
         self._post_req('sendMessage', params)
+
+    def send_document(self, chat_id, file_path):
+        params = {
+            'chat_id': chat_id,
+        }
+        self._post_req('sendDocument', params, file_path=file_path)
 
     def process_event(self, event):
         raise NotImplementedError

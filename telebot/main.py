@@ -1,5 +1,8 @@
 # coding: utf-8
 
+import os
+import tempfile
+
 from bot import TBot
 from settings import TSettings
 from link_db import TLinkDb
@@ -42,11 +45,25 @@ class TLinkBot(TBot):
         msg = 'Total links: {stat[links]}\nTotal users: {stat[users]}'.format(stat=self.db.total_stat())
         self.send_message(chat_id, msg)
 
-    def dump_csv(self, chat_id):
+    def _dump_csv(self, chat_id, links):
         reply = []
-        for link in self.db.all_links():
-            reply.append('{},{},{}'.format(link['id'], link['uid'], link['link'].replace(',', '\,')))
-        self.send_message(chat_id, '\n'.join(reply))
+        for link in links:
+            if 'uid' in link:
+                reply.append('{},{},{}'.format(link['id'], link['uid'], link['link'].replace(',', '\,')))
+            else:
+                reply.append('{},{}'.format(link['id'], link['link'].replace(',', '\,')))
+
+        tmp = tempfile.NamedTemporaryFile(suffix='.csv', delete=False)
+        tmp.write('\n'.join(reply))
+        tmp.close()
+        self.send_document(chat_id, tmp.name)
+        os.unlink(tmp.name)
+
+    def dump_csv(self, chat_id, uid):
+        return self._dump_csv(chat_id, self.db.links(uid, limit=10000))
+
+    def dump_csv_full(self, chat_id):
+        return self._dump_csv(chat_id, self.db.all_links())
 
     def process_command(self, event):
         if event.command == '/all':
@@ -59,8 +76,10 @@ class TLinkBot(TBot):
             return self.remove_link(event.uid, event.args[0], event.chat_id)
         if event.command == '/stat':
             return self.send_stat(event.chat_id)
-        if event.command == '/dump' and is_admin(event.uid):
-            return self.dump_csv(event.chat_id)
+        if event.command == '/dump':
+            return self.dump_csv(event.chat_id, event.uid)
+        if event.command == '/dump_full' and is_admin(event.uid):
+            return self.dump_csv_full(event.chat_id)
 
         self.send_help_message(event.chat_id)
 
