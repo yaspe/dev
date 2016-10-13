@@ -30,7 +30,7 @@ type t_house struct {
 // house
 
 func NewHouse() *t_house {
-	var house = new(t_house)
+	house := new(t_house)
 
 	// generation randon inner space
 	for i := uint(0); i < house_size; i += 1 {
