@@ -4,6 +4,10 @@ import (
 	"math/rand"
 )
 
+type t_player struct {
+	x, y uint
+}
+
 type RoomType int
 
 const (
@@ -19,10 +23,17 @@ type t_room struct {
 	gen_group uint // used to generate a valid house, do not needed after generation
 }
 
+type IHouse interface {
+	GetSize() uint
+	GetRooms() [house_size][house_size]t_room
+	GetPlayerPos() (uint, uint)
+}
+
 const house_size uint = 25
 
 type t_house struct {
-	rooms [house_size][house_size]t_room
+	rooms  [house_size][house_size]t_room
+	player t_player
 }
 
 // methods
@@ -81,7 +92,9 @@ func NewHouse() *t_house {
 		}
 	}
 
-	house.rooms[house_size-1][house_size/2].room_type = RT_ENTRANCE
+	house.player.x = house_size - 1
+	house.player.y = house_size / 2
+	house.rooms[house.player.x][house.player.y].room_type = RT_ENTRANCE
 	return house
 }
 
@@ -91,6 +104,10 @@ func (house *t_house) GetSize() uint {
 
 func (house *t_house) GetRooms() [house_size][house_size]t_room {
 	return house.rooms
+}
+
+func (house *t_house) GetPlayerPos() (uint, uint) {
+	return house.player.x, house.player.y
 }
 
 // room
